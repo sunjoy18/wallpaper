@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Aftertone — turn your photos into a lock screen</title>
+<meta name="description" content="Aftertone is a Canva-style studio for building personalized iPhone and Android lock screens from your own photos." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌙</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav">
+  <a class="brand" href="#" data-nav="home">
+    <span class="brand-mark">☾</span> Aftertone
+  </a>
+  <nav class="nav-links">
+    <button class="nav-link" data-nav="gallery">Explore</button>
+    <button class="nav-link" data-nav="editor">Create</button>
+  </nav>
+  <button class="btn btn-primary btn-sm" data-nav="gallery">Start creating</button>
+</header>
+
+<!-- ============ HOME / HERO ============ -->
+<section class="view" id="view-home">
+  <div class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Lock screens, made from your own memories</p>
+      <h1 class="hero-title">Your camera roll,<br>arranged like<br><em>art.</em></h1>
+      <p class="hero-sub">Pick a layout, drop in your favorite photos, and Aftertone
+        arranges them into a lock screen that actually looks like it belongs on your
+        phone — clock, date, and safe zones included.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" data-nav="gallery">Browse templates</button>
+        <button class="btn btn-ghost" data-nav="editor">Start from blank</button>
+      </div>
+      <div class="hero-stats">
+        <div><strong>50</strong><span>starting layouts</span></div>
+        <div><strong>8</strong><span>moods &amp; occasions</span></div>
+        <div><strong>1 tap</strong><span>to export in HD</span></div>
+      </div>
+    </div>
+    <div class="hero-phone" id="heroPhone"></div>
+  </div>
+
+  <div class="section-head">
+    <h2>Explore by mood</h2>
+    <p>Every category is built around how people actually fill a lock screen.</p>
+  </div>
+  <div class="chip-row" id="homeCategoryChips"></div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section class="view" id="view-gallery">
+  <div class="gallery-head">
+    <div>
+      <p class="eyebrow">Explore</p>
+      <h1 class="page-title">Find a starting point</h1>
+    </div>
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Search “polaroid”, “travel”, “heart”…" />
+    </div>
+  </div>
+  <div class="chip-row" id="galleryCategoryChips"></div>
+  <div class="template-grid" id="templateGrid"></div>
+</section>
+
+<!-- ============ EDITOR ============ -->
+<section class="view" id="view-editor">
+  <div class="editor-shell">
+    <aside class="editor-rail">
+      <div class="rail-group">
+        <h3>Add photos</h3>
+        <label class="upload-drop" id="uploadDrop">
+          <input type="file" id="fileInput" accept="image/*" multiple hidden />
+          <span class="upload-icon">＋</span>
+          <span>Upload photos</span>
+          <small>or drag &amp; drop</small>
+        </label>
+        <div class="tray" id="photoTray"></div>
+      </div>
+
+      <div class="rail-group">
+        <h3>Background</h3>
+        <div class="swatch-row" id="bgSwatches"></div>
+      </div>
+
+      <div class="rail-group">
+        <h3>Add</h3>
+        <div class="tool-row">
+          <button class="tool-btn" id="addTextBtn"><span>Aa</span>Text</button>
+          <button class="tool-btn" id="addStickerBtn"><span>✦</span>Sticker</button>
+        </div>
+        <div class="sticker-picker" id="stickerPicker"></div>
+      </div>
+
+      <div class="rail-group" id="filterGroup">
+        <h3>Filter</h3>
+        <div class="filter-row" id="filterRow"></div>
+      </div>
+
+      <div class="rail-group" id="objectGroup" hidden>
+        <h3>Selected layer</h3>
+        <div class="obj-controls">
+          <label>Size <input type="range" id="scaleRange" min="20" max="220" value="100"></label>
+          <label>Rotate <input type="range" id="rotateRange" min="-45" max="45" value="0"></label>
+          <button class="tool-btn danger" id="deleteObjBtn">Delete layer</button>
+        </div>
+      </div>
+    </aside>
+
+    <div class="editor-canvas-wrap">
+      <div class="editor-toolbar">
+        <button class="icon-btn" data-nav="gallery" title="Back to templates">←</button>
+        <div class="device-toggle">
+          <button class="seg active" data-device="iphone">iPhone</button>
+          <button class="seg" data-device="android">Android</button>
+        </div>
+        <button class="btn btn-primary btn-sm" data-nav="preview">Preview lock screen →</button>
+      </div>
+      <div class="canvas-stage">
+        <div class="canvas-frame" id="canvasFrame">
+          <canvas id="editorCanvas"></canvas>
+        </div>
+        <p class="canvas-hint">Tap a slot, then upload or drag a photo onto it. Drag corners to resize, pinch/rotate handle to turn.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PREVIEW ============ -->
+<section class="view" id="view-preview">
+  <div class="preview-shell">
+    <div class="preview-side">
+      <p class="eyebrow">Preview</p>
+      <h1 class="page-title">This is your lock screen</h1>
+      <p class="preview-copy">Clock, date and safe zones are shown exactly like they'll
+        sit on your device. Switch styles or export straight to your camera roll.</p>
+
+      <div class="rail-group">
+        <h3>Clock style</h3>
+        <div class="swatch-row" id="clockStyles"></div>
+      </div>
+
+      <div class="preview-actions">
+        <button class="btn btn-ghost" data-nav="editor">← Keep editing</button>
+        <button class="btn btn-primary" id="downloadBtn">Download HD PNG</button>
+      </div>
+    </div>
+    <div class="preview-phone-wrap">
+      <div class="device-toggle">
+        <button class="seg active" data-device="iphone">iPhone</button>
+        <button class="seg" data-device="android">Android</button>
+      </div>
+      <div class="preview-phone" id="previewPhone">
+        <div class="preview-clock" id="previewClock">
+          <span class="pc-time">22:09</span>
+          <span class="pc-date">Wednesday, 2 September</span>
+        </div>
+        <img class="preview-image" id="previewImage" alt="Your lock screen" />
+        <div class="preview-notch"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+<script src="js/templates.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
