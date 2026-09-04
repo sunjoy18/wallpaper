@@ -384,11 +384,17 @@ function fillSlot(slot, src){
     img.set({originX:"center", originY:"center", left:0, top:0});
     img.scale(scale);
 
+    // clipPath is nested inside the image's own transform, so it gets
+    // multiplied by the image's scale too. Since `scale` shrinks a
+    // full-resolution photo down a lot, we have to size the clip in
+    // the image's *local* (pre-scale) units — dividing by scale here —
+    // so the crop comes out at the slot's actual on-screen size
+    // instead of shrinking along with the photo.
     let clip;
     if(slot.slotShape==="circle"){
-      clip = new fabric.Ellipse({rx:sw/2, ry:sh/2, originX:"center", originY:"center"});
+      clip = new fabric.Ellipse({rx:(sw/2)/scale, ry:(sh/2)/scale, originX:"center", originY:"center"});
     } else {
-      clip = new fabric.Rect({width:sw, height:sh, rx:10, ry:10, originX:"center", originY:"center"});
+      clip = new fabric.Rect({width:sw/scale, height:sh/scale, rx:10/scale, ry:10/scale, originX:"center", originY:"center"});
     }
     img.clipPath = clip;
 
@@ -398,6 +404,11 @@ function fillSlot(slot, src){
       cornerColor:"#FF5C8A", cornerStyle:"circle", transparentCorners:false, borderColor:"#8B7CFF"
     });
     group.isPhotoSlot = true;
+    // The group's auto-computed bounding box comes from the image's
+    // full (unclipped) scaled size, which overshoots the visible crop
+    // in whichever axis "cover" fit overflows. Pin it to the actual
+    // slot size so the selection handles hug what's really visible.
+    group.set({width: sw, height: sh});
     group._baseScaleX = group.scaleX; group._baseScaleY = group.scaleY;
 
     // The slot may already have been removed from the canvas (e.g. if
