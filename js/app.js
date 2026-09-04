@@ -368,7 +368,17 @@ function findSlotAtPoint(px,py){
 }
 
 function fillSlot(slot, src){
+  // Claim this slot synchronously, before the image has even started
+  // loading, so a second upload firing moments later can't grab the
+  // same still-unfilled slot while this one is mid-flight.
+  slot.filled = true;
+
   fabric.Image.fromURL(src, (img)=>{
+    if(!img || !img.width){
+      toast("That photo couldn't be loaded — try a different file");
+      slot.filled = false;
+      return;
+    }
     const sw = slot.width * slot.scaleX, sh = slot.height * slot.scaleY;
     const scale = Math.max(sw/img.width, sh/img.height);
     img.set({originX:"center", originY:"center", left:0, top:0});
@@ -390,16 +400,27 @@ function fillSlot(slot, src){
     group.isPhotoSlot = true;
     group._baseScaleX = group.scaleX; group._baseScaleY = group.scaleY;
 
+    // The slot may already have been removed from the canvas (e.g. if
+    // it was somehow filled twice); guard indexOf so we never insert
+    // at a bogus -1 index.
     const idx = state.canvas.getObjects().indexOf(slot);
-    state.canvas.remove(slot);
-    state.canvas.insertAt(group, idx, false);
+    if(idx > -1){
+      state.canvas.remove(slot);
+      state.canvas.insertAt(group, idx, false);
+    } else {
+      state.canvas.add(group);
+    }
     state.canvas.setActiveObject(group);
     state.canvas.renderAll();
-  }, {crossOrigin:"anonymous"});
+  });
 }
 
 function addFreeImage(src){
   fabric.Image.fromURL(src, (img)=>{
+    if(!img || !img.width){
+      toast("That photo couldn't be loaded — try a different file");
+      return;
+    }
     img.scaleToWidth(CANVAS_W*0.55);
     img.set({left: CANVAS_W/2, top: CANVAS_H/2, originX:"center", originY:"center",
       cornerColor:"#FF5C8A", cornerStyle:"circle", transparentCorners:false, borderColor:"#8B7CFF"});
@@ -407,7 +428,7 @@ function addFreeImage(src){
     state.canvas.add(img);
     state.canvas.setActiveObject(img);
     state.canvas.renderAll();
-  }, {crossOrigin:"anonymous"});
+  });
 }
 
 function addText(){
